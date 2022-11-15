@@ -6,17 +6,15 @@ import org.springframework.stereotype.Service
 
 @Service
 class CustomerService(
-    val customerRepository: CustomerRepository
+        val customerRepository: CustomerRepository
 ) {
-
-    val customers = mutableListOf<CustomerModel>()
 
     fun getCustomer(name: String?): List<CustomerModel> {
         name?.let {
             // filtrando se o nome contem name e permitindo ignoreCase(Ignora letras maisculas)
-            return customers.filter { it.name.contains(name, true) }
+            return customerRepository.findByNameContaining(it)
         }
-        return customers
+        return customerRepository.findAll().toList()
     }
 
     fun createCustomer(customer: CustomerModel) { // criando usuario.
@@ -24,18 +22,23 @@ class CustomerService(
     }
 
     fun getCustomersId(id: Int): CustomerModel {
-        return customers.filter { it.id == id }.first() // pegando a primeira info com o id passado.
+        return customerRepository.findById(id).orElseThrow() // pegando a primeira info com o id passado.
     }
 
     fun updateCustomer(customer: CustomerModel) {
-        customers.filter { it.id == customer.id }.first().let { // pegando a primeira info com o id passado.
-            it.name = customer.name
-            it.email = customer.email
+        if (!customerRepository.existsById(customer.id!!)) {
+            throw Exception()
         }
+
+        customerRepository.save(customer)
     }
 
     fun deleteCustomer(id: Int) {
-        customers.removeIf { it.id == id } // removendo a primeira info com o id passado, se existir.
+        if (!customerRepository.existsById(id)) {
+            throw Exception()
+        }
+
+        customerRepository.deleteById(id)
     }
 
 }
