@@ -9,6 +9,7 @@ data class CustomerModel(
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Int? = null,
 
+        @Column
         var name: String,
 
         @Column(name = "email")
